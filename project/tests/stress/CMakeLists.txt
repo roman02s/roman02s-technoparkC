@@ -1,0 +1,9 @@
+add_library(lib_gen_matrix STATIC src/gen_matrix.c)
+
+add_executable(stress_test_matrix_one_thread stress_test_matrix_transpose_one_thread.c)
+target_link_libraries(stress_test_matrix_one_thread lib_matrix_one_thread lib_gen_matrix)
+target_include_directories(stress_test_matrix_one_thread PRIVATE ../../include include)
+
+add_executable(stress_test_matrix_multi_thread stress_test_matrix_transpose_multi_thread.c)
+target_link_libraries(stress_test_matrix_multi_thread lib_matrix_multi_thread lib_gen_matrix)
+target_include_directories(stress_test_matrix_multi_thread PRIVATE ../../include include)
