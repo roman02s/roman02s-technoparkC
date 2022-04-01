@@ -9,10 +9,8 @@ ssize_t gen_matrix(const char * path) {
     if (file == NULL) {
         return -1;
     }
-    size_t rows;
-    size_t cols;
-    rows = 10000;
-    cols = 5000;
+    size_t rows = 10000;
+    size_t cols = 5000;
 
     fprintf(file, "%zu %zu\n", rows, cols);
 

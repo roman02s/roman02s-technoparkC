@@ -42,6 +42,12 @@ jobs:
           lcov --capture --directory coverage_one_th/ --output-file matrix_transpose_one_thread.info
           genhtml matrix_transpose_one_thread.info --output-directory coverage_one_th-report/
 
+      - name: Archive coverage one-thread-mode test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: Coverage one-thread-mode test
+          path: coverage_one_th-report/
+
       - name: Coverage test_multi_thread_program
         run: |
             sudo apt-get install -y lcov
@@ -51,6 +57,13 @@ jobs:
             cd ..
             lcov --capture --directory coverage_multi_th/ --output-file matrix_transpose_multi_thread.info
             genhtml matrix_transpose_multi_thread.info --output-directory coverage_multi_th-report/
+
+      - name: Archive coverage multi-thread-mode test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: Coverage multi-thread-mode test
+          path: coverage_multi_th-report/
+
       - name: stress test one thread algorithm
         run: |
           cd build
@@ -67,3 +80,9 @@ jobs:
           mkdir valgrid-output
           valgrind --leak-check=full --tool=memcheck --show-leak-kinds=all ./build/project/tests/test_matrix_one_thread
           valgrind --leak-check=full --tool=memcheck --show-leak-kinds=all ./build/project/tests/test_matrix_multi_thread
+
+      - name: Archive valgrind test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: Valgrind test
+          path: valgrid-output/

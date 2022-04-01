@@ -11,11 +11,13 @@
 #include "matrix.h"
 
 matrix_t* create_matrix(size_t rows, size_t cols) {
-    if (rows == 0 || cols == 0)
+    if (rows == 0 || cols == 0) {
         return NULL;
+    }
     matrix_t* M = malloc(sizeof(matrix_t));
-    if (M == NULL)
+    if (M == NULL) {
         return NULL;
+    }
     M->row = rows;
     M->col = cols;
     M->data = calloc(rows, sizeof(double *));
@@ -23,6 +25,7 @@ matrix_t* create_matrix(size_t rows, size_t cols) {
         free(M);
         return NULL;
     }
+
     for (size_t i = 0; i < rows; i++) {
         M->data[i] = calloc(cols, sizeof(double));
         if (M->data[i] == NULL) {
@@ -35,11 +38,13 @@ matrix_t* create_matrix(size_t rows, size_t cols) {
 
 
 matrix_t* create_matrix_from_file(const char* path_file) {
-    if (path_file == NULL)
+    if (path_file == NULL) {
         return NULL;
+    }
     FILE* fmatrix = fopen(path_file, "a+");
-    if (fmatrix == NULL)
+    if (fmatrix == NULL) {
         return NULL;
+    }
     size_t rows;
     size_t cols;
     if (fscanf(fmatrix, "%zu%zu", &rows, &cols) != 2) {
@@ -53,21 +58,27 @@ matrix_t* create_matrix_from_file(const char* path_file) {
     }
     M->row = rows;
     M->col = cols;
-    for (size_t i = 0; i < rows; i++)
-        for (size_t j = 0; j < cols; j++)
+    for (size_t i = 0; i < rows; i++) {
+        for (size_t j = 0; j < cols; j++) {
             if (fscanf(fmatrix, "%lf", &M->data[i][j]) != 1) {
                 fclose(fmatrix);
                 free_matrix(M);
                 return NULL;
             }
+        }
+    }
     fclose(fmatrix);
     return M;
 }
 
 
 ssize_t free_matrix(matrix_t* matrix) {
-    for (size_t i = 0; i < matrix->row; i++)
+    if (matrix == NULL) {
+        return 1;
+    }
+    for (size_t i = 0; i < matrix->row; i++) {
         free(matrix->data[i]);
+    }
     free(matrix->data);
     free(matrix);
     return 0;
@@ -85,9 +96,10 @@ matrix_t* transp(matrix_t* matrix) {
         return NULL;
     }
 
-    int status;
-
-    size_t process_count = sysconf(_SC_NPROCESSORS_ONLN) % matrix->col;
+    ssize_t process_count = sysconf(_SC_NPROCESSORS_ONLN) % matrix->col;
+    if (process_count == -1) {
+        return NULL;
+    }
     size_t part_size = matrix->col / process_count;
     pid_t *pids = (pid_t *)malloc(sizeof(pid_t) * process_count);
     if (pids == NULL) {
@@ -125,7 +137,7 @@ matrix_t* transp(matrix_t* matrix) {
 
         exit(EXIT_SUCCESS);
     }
-
+    ssize_t status;
     for (size_t i = 0; i < process_count; i++) {
         if (waitpid(pids[i], &status, 0) != pids[i]) {
             free_matrix(new_matrix);

@@ -76,6 +76,9 @@ matrix_t* fill_matrix(matrix_t * matrix, double **source_array) {
 
 
 ssize_t free_matrix(matrix_t* matrix) {
+    if (matrix == NULL) {
+        return 1;
+    }
     for (size_t i = 0; i < matrix->row; i++) {
         free(matrix->data[i]);
     }
