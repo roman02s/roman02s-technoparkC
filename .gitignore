@@ -1,0 +1,10 @@
+cmake-build-debug
+build
+.idea
+.DS_Store
+coverage_one_th
+coverage_one_th-report
+matrix_transpose_one_thread.info
+coverage_multi_th
+coverage_multi_th-report
+matrix_transpose_multi_thread.info
