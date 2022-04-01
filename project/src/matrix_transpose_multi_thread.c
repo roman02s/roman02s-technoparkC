@@ -137,7 +137,7 @@ matrix_t* transp(matrix_t* matrix) {
 
         exit(EXIT_SUCCESS);
     }
-    ssize_t status;
+    size_t status;
     for (size_t i = 0; i < process_count; i++) {
         if (waitpid(pids[i], &status, 0) != pids[i]) {
             free_matrix(new_matrix);
