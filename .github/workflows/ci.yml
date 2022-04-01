@@ -1,0 +1,69 @@
+name: CI
+on: push
+jobs:
+  CI_unit_tests:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name : Check style code
+        run : |
+          sudo apt-get update
+          sudo apt-get install -y cppcheck
+          cppcheck --enable=all --enable=warning,style,performance,portability --suppress=missingIncludeSystem . # --check-config
+
+      - name : Building
+        run : |
+          mkdir build
+          cd build
+          sudo apt-get install -y libgtest-dev
+          cmake ..
+          make
+          cd ..
+
+      - name: Unit-tests test_one_thread_program
+        run: |
+          cd build
+          ./project/tests/test_matrix_one_thread
+          cd ..
+      - name: Unit-tests test_multi_thread_program
+        run: |
+          cd build
+          ./project/tests/test_matrix_multi_thread
+          cd ..
+
+      - name: Coverage test_one_thread_program
+        run: |
+          sudo apt-get install -y lcov
+          mkdir coverage_one_th && cd coverage_one_th
+          gcov ../build/CMakeFiles/lib_matrix_one_thread.dir/project/src/matrix_transpose_one_thread.c.gcno
+          cp -r ../build/CMakeFiles/lib_matrix_one_thread.dir/ .
+          cd ..
+          lcov --capture --directory coverage_one_th/ --output-file matrix_transpose_one_thread.info
+          genhtml matrix_transpose_one_thread.info --output-directory coverage_one_th-report/
+
+      - name: Coverage test_multi_thread_program
+        run: |
+            sudo apt-get install -y lcov
+            mkdir coverage_multi_th && cd coverage_multi_th
+            gcov ../build/CMakeFiles/lib_matrix_multi_thread.dir/project/src/matrix_transpose_multi_thread.c.gcno
+            cp -r ../build/CMakeFiles/lib_matrix_multi_thread.dir/ .
+            cd ..
+            lcov --capture --directory coverage_multi_th/ --output-file matrix_transpose_multi_thread.info
+            genhtml matrix_transpose_multi_thread.info --output-directory coverage_multi_th-report/
+      - name: stress test one thread algorithm
+        run: |
+          cd build
+          ./project/tests/stress/stress_test_matrix_one_thread
+          cd ..
+      - name: stress test multi thread algorithm
+        run: |
+          cd build
+          ./project/tests/stress/stress_test_matrix_multi_thread
+          cd ..
+      - name: Valgrind tests
+        run: |
+          sudo apt-get install -y valgrind
+          mkdir valgrid-output
+          valgrind --leak-check=full --tool=memcheck --show-leak-kinds=all ./build/project/tests/test_matrix_one_thread
+          valgrind --leak-check=full --tool=memcheck --show-leak-kinds=all ./build/project/tests/test_matrix_multi_thread
